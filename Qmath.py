@@ -40,40 +40,131 @@ CARRY = CARRY()
 rCARRY = rCARRY()
 
 
-def get_binary_LSB_to_MSB(num):
-    return np.binary_repr(num)[::-1]
+def get_binary_LSB_to_MSB(num, size):
+    return np.binary_repr(num, size)[::-1]
 
-######### example n=10 ##########
 
-def run_example():
-    # initialize 10 qubit system
-    # QR = QuantumRegister(10)
-    A = QuantumRegister(3, 'a')
-    B = QuantumRegister(3, 'b')
-    C = QuantumRegister(4, 'c')
+N = 7 #number to be factored
+n = int(np.ceil(np.log2(N))) #bitsize of N
+
+def ADDER(a, b):
     
-    QR_circ = QuantumCircuit(A, B, C)
+    # initialize registers for addition gate
+    A = QuantumRegister(n, 'a')
+    B = QuantumRegister(n+1, 'b')
+    C = QuantumRegister(n, 'c')
+    QR_circ = QuantumCircuit(A, B, C, name='ADDER')
     
-    QR_circ.append(CARRY, [C[0], A[0], B[0], C[1]])
-    QR_circ.append(CARRY, [C[1], A[1], B[1], C[2]])
-    QR_circ.append(CARRY, [C[2], A[2], B[2], C[3]])
-    QR_circ.cx(A[2], B[2])
-    QR_circ.append(SUM, [C[2], A[2], B[2]])
-    QR_circ.append(rCARRY, [C[1], A[1], B[1], C[2]])
-    QR_circ.append(SUM, [C[1], A[1], B[1]])
-    QR_circ.append(rCARRY, [C[0], A[0], B[0], C[1]])
+    
+    # get LSB-first binary representations of input integers
+    # may already be in binary
+    if type(a) == str:
+        pass
+    else:
+        a_bin = get_binary_LSB_to_MSB(a, n-1)
+        for i in range(len(a_bin)):
+            if a_bin[i] == '1':
+                QR_circ.x(A[i]) #only for testing (decimal argument passed)
+    if type(b) == str:
+        pass
+    else:
+        b_bin = get_binary_LSB_to_MSB(b, n)
+        for i in range(len(b_bin)):
+            if b_bin[i] == '1':
+                QR_circ.x(B[i])
+    
+    # cascaded CARRY gates
+    for i in range(n-1):
+        QR_circ.append(CARRY, [C[i], A[i], B[i], C[i+1]]) 
+    # final CARRY gate
+    QR_circ.append(CARRY, [C[n-1], A[n-1], B[n-1], B[n]]) 
+    # single CNOT in ADDER system
+    QR_circ.cx(A[n-1], B[n-1])
+    
+    # cascaded SUM and rCARRY
+    for i in range(n-1):
+        QR_circ.append(SUM, [C[n-1-i], A[n-1-i], B[n-1-i]])
+        QR_circ.append(rCARRY, [C[n-2-i], A[n-2-i], B[n-2-i], C[n-1-i]])
+    # final SUM
     QR_circ.append(SUM, [C[0], A[0], B[0]])
+    return QR_circ.to_instruction()
+
+    
+ADDER = ADDER(3, 5)
+
+# A = QuantumRegister(3, 'a')
+# B = QuantumRegister(4, 'b')
+# C = QuantumRegister(3, 'c')
+
+# QR_circ = QuantumCircuit(A, B, C)
+
+# QR_circ.append(ADDER, [A[0], A[1], A[2], B[0], B[1], B[2], B[3], C[0], C[1], C[2]])
+    
+
+
+
+# ######### example n=10 for 3+5=8 ##########
+# a = 3
+# b = 5
+
+
+
+# # initialize 10 qubit system
+# A = QuantumRegister(3, 'a')
+# B = QuantumRegister(4, 'b')
+# C = QuantumRegister(3, 'c')
+
+# QR_circ = QuantumCircuit(A, B, C)
+
+# # initialize registers to hold bit information
+# a_bin = get_binary_LSB_to_MSB(a, 3)
+# b_bin = get_binary_LSB_to_MSB(b, 4)
+# for i in range(len(a_bin)):
+#     if a_bin[i] == '1':
+#         QR_circ.x(A[i])
+# for i in range(len(b_bin)):
+#     if b_bin[i] == '1':
+#         QR_circ.x(B[i])
+
+
+# QR_circ.append(CARRY, [C[0], A[0], B[0], C[1]])
+# QR_circ.append(CARRY, [C[1], A[1], B[1], C[2]])
+# QR_circ.append(CARRY, [C[2], A[2], B[2], B[3]])
+# QR_circ.cx(A[2], B[2])
+# QR_circ.append(SUM, [C[2], A[2], B[2]])
+# QR_circ.append(rCARRY, [C[1], A[1], B[1], C[2]])
+# QR_circ.append(SUM, [C[1], A[1], B[1]])
+# QR_circ.append(rCARRY, [C[0], A[0], B[0], C[1]])
+# QR_circ.append(SUM, [C[0], A[0], B[0]])
         
     
-    # QR_circ.append(CARRY, [QR[0], QR[1], QR[2], QR[3]])
-    # QR_circ.append(CARRY, [QR[3], QR[4], QR[5], QR[6]])
-    # QR_circ.append(CARRY, [QR[6], QR[7], QR[8], QR[9]])
-    # QR_circ.cx(QR[7], QR[8])
-    # QR_circ.append(SUM, [QR[6], QR[7], QR[8]])
-    # QR_circ.append(rCARRY, [QR[3], QR[4], QR[5], QR[6]])
-    # QR_circ.append(SUM, [QR[3], QR[4], QR[5]])
-    # QR_circ.append(rCARRY, [QR[0], QR[1], QR[2], QR[3]])
-    # QR_circ.append(SUM, [QR[0], QR[1], QR[2]])
-    
-    return QR_circ.draw(fold=-1)
+
+
+
+# c = QR_circ
+# # c.measure_all()
+
+# c.draw(fold=-1)
+
+
+
+
+
+
+
+from qiskit import Aer, transpile
+
+
+# ##############
+simulator = Aer.get_backend('aer_simulator')
+c = transpile(c, simulator)
+result = simulator.run(c).result()
+counts = result.get_counts(c)
+out = list(counts.keys())[0][::-1]
+
+A_out = out[0:len(a_bin)]
+B_out = out[len(a_bin): len(a_bin) + len(b_bin)]
+C_out = out[len(a_bin) + len(b_bin)::]
+
+print('Register A: {}, Register B: {}, Register C: {}'.format(A_out, B_out, C_out))
 
