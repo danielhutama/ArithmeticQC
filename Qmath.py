@@ -8,7 +8,7 @@ import numpy as np
 
 from qiskit import *
 
-
+from qiskit import Aer, transpile
 
 
 
@@ -44,7 +44,7 @@ def get_binary_LSB_to_MSB(num, size):
     return np.binary_repr(num, size)[::-1]
 
 
-N = 7 #number to be factored
+N = 10 #number to be factored
 n = int(np.ceil(np.log2(N))) #bitsize of N
 
 def ADDER(a, b):
@@ -61,14 +61,14 @@ def ADDER(a, b):
     if type(a) == str:
         pass
     else:
-        a_bin = get_binary_LSB_to_MSB(a, n-1)
+        a_bin = get_binary_LSB_to_MSB(a, n)
         for i in range(len(a_bin)):
             if a_bin[i] == '1':
                 QR_circ.x(A[i]) #only for testing (decimal argument passed)
     if type(b) == str:
         pass
     else:
-        b_bin = get_binary_LSB_to_MSB(b, n)
+        b_bin = get_binary_LSB_to_MSB(b, n+1)
         for i in range(len(b_bin)):
             if b_bin[i] == '1':
                 QR_circ.x(B[i])
@@ -90,7 +90,6 @@ def ADDER(a, b):
     return QR_circ.to_instruction()
 
     
-ADDER = ADDER(3, 5)
 
 # A = QuantumRegister(3, 'a')
 # B = QuantumRegister(4, 'b')
@@ -98,7 +97,7 @@ ADDER = ADDER(3, 5)
 
 # QR_circ = QuantumCircuit(A, B, C)
 
-# QR_circ.append(ADDER, [A[0], A[1], A[2], B[0], B[1], B[2], B[3], C[0], C[1], C[2]])
+# QR_circ.append
     
 
 
@@ -109,12 +108,6 @@ ADDER = ADDER(3, 5)
 
 
 
-# # initialize 10 qubit system
-# A = QuantumRegister(3, 'a')
-# B = QuantumRegister(4, 'b')
-# C = QuantumRegister(3, 'c')
-
-# QR_circ = QuantumCircuit(A, B, C)
 
 # # initialize registers to hold bit information
 # a_bin = get_binary_LSB_to_MSB(a, 3)
@@ -141,30 +134,52 @@ ADDER = ADDER(3, 5)
 
 
 
-# c = QR_circ
-# # c.measure_all()
-
-# c.draw(fold=-1)
 
 
 
 
 
+a = 3
+b = 5
 
+ADDER = ADDER(a, b)
 
-from qiskit import Aer, transpile
+execute_sim=1
 
-
-# ##############
-simulator = Aer.get_backend('aer_simulator')
-c = transpile(c, simulator)
-result = simulator.run(c).result()
-counts = result.get_counts(c)
-out = list(counts.keys())[0][::-1]
-
-A_out = out[0:len(a_bin)]
-B_out = out[len(a_bin): len(a_bin) + len(b_bin)]
-C_out = out[len(a_bin) + len(b_bin)::]
-
-print('Register A: {}, Register B: {}, Register C: {}'.format(A_out, B_out, C_out))
+if execute_sim == 1:
+    
+    
+    # # initialize 10 qubit system
+     A = QuantumRegister(n, 'a')        
+     B = QuantumRegister(n+1, 'b')
+     C = QuantumRegister(n, 'c')
+    
+     QR_circ = QuantumCircuit(A, B, C)
+     c = QR_circ
+     
+     enumerated_qbits = []
+     # build list of target qbits for append function
+     for i in range(n):
+         enumerated_qbits.append(A[i])
+     for i in range(n+1):
+         enumerated_qbits.append(B[i])
+     for i in range(n):
+         enumerated_qbits.append(C[i])
+     
+     c.append(ADDER, enumerated_qbits)
+     c.measure_all()
+    
+     c.draw(fold=-1)
+     
+     simulator = Aer.get_backend('aer_simulator')
+     c = transpile(c, simulator)
+     result = simulator.run(c).result()
+     counts = result.get_counts(c)
+     out = list(counts.keys())[0][::-1]
+    
+     A_out = out[0:n]
+     B_out = out[n: 2*n + 1]
+     C_out = out[2*n+1::]
+    
+     print('Register A: {}, Register B: {}, Register C: {}'.format(A_out, B_out, C_out))
 
