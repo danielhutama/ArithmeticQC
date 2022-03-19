@@ -44,8 +44,7 @@ def get_binary_LSB_to_MSB(num, size):
     return np.binary_repr(num, size)[::-1]
 
 
-N = 10 #number to be factored
-n = int(np.ceil(np.log2(N))) #bitsize of N
+
 
 def ADDER(a, b):
     
@@ -91,56 +90,17 @@ def ADDER(a, b):
 
     
 
-# A = QuantumRegister(3, 'a')
-# B = QuantumRegister(4, 'b')
-# C = QuantumRegister(3, 'c')
-
-# QR_circ = QuantumCircuit(A, B, C)
-
-# QR_circ.append
-    
-
-
-
-# ######### example n=10 for 3+5=8 ##########
-# a = 3
-# b = 5
-
-
-
-
-# # initialize registers to hold bit information
-# a_bin = get_binary_LSB_to_MSB(a, 3)
-# b_bin = get_binary_LSB_to_MSB(b, 4)
-# for i in range(len(a_bin)):
-#     if a_bin[i] == '1':
-#         QR_circ.x(A[i])
-# for i in range(len(b_bin)):
-#     if b_bin[i] == '1':
-#         QR_circ.x(B[i])
-
-
-# QR_circ.append(CARRY, [C[0], A[0], B[0], C[1]])
-# QR_circ.append(CARRY, [C[1], A[1], B[1], C[2]])
-# QR_circ.append(CARRY, [C[2], A[2], B[2], B[3]])
-# QR_circ.cx(A[2], B[2])
-# QR_circ.append(SUM, [C[2], A[2], B[2]])
-# QR_circ.append(rCARRY, [C[1], A[1], B[1], C[2]])
-# QR_circ.append(SUM, [C[1], A[1], B[1]])
-# QR_circ.append(rCARRY, [C[0], A[0], B[0], C[1]])
-# QR_circ.append(SUM, [C[0], A[0], B[0]])
-        
-    
 
 
 
 
 
 
+N = 39 #number to be factored
+n = int(np.ceil(np.log2(N))) #bitsize of N
 
-
-a = 3
-b = 5
+a = 4
+b = 7
 
 ADDER = ADDER(a, b)
 
@@ -180,6 +140,8 @@ if execute_sim == 1:
      A_out = out[0:n]
      B_out = out[n: 2*n + 1]
      C_out = out[2*n+1::]
-    
-     print('Register A: {}, Register B: {}, Register C: {}'.format(A_out, B_out, C_out))
+     
+     
+     print('IN  | Register A: {} ({}), Register B: {} ({})'.format(get_binary_LSB_to_MSB(a, n), a, get_binary_LSB_to_MSB(b, n+1), b))
+     print('OUT | Register A: {} ({}), Register B: {} ({}), Register C: {}'.format(A_out, int(A_out[::-1], 2), B_out, int(B_out[::-1], 2), C_out))
 
