@@ -96,7 +96,7 @@ def ADDER(a, b):
 
 
 
-N = 39 #number to be factored
+N = 15 #number to be factored
 n = int(np.ceil(np.log2(N))) #bitsize of N
 
 a = 4
