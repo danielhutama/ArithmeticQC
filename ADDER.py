@@ -127,9 +127,11 @@ if execute_sim == 1:
          enumerated_qbits.append(C[i])
      
      c.append(ADDER, enumerated_qbits)
+     c.draw(fold=-1)
+     
      c.measure_all()
     
-     c.draw(fold=-1)
+     
      
      simulator = Aer.get_backend('aer_simulator')
      c = transpile(c, simulator)
