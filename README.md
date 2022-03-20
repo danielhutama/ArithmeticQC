@@ -3,7 +3,7 @@ Dan's reconfigurable quantum computing library of arithmetic functions.
 
 Work in progress. Components will be cast into Python classes later in development. 
 
-Goal: Shor's algorithm with 7n+1 qubits, where n = ceil(log2(N)). N is the semiprime integer to be factored. This follows Valtko Vedral's gate descriptions for component modules. 
+Goal: Shor's algorithm with 7n+1 qubits, where n = ceil(log2(N)). N is the semiprime integer to be factored. This follows Vlatko Vedral's gate descriptions for component modules. 
 
 Project roadmap:
 
