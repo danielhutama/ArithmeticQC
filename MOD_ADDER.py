@@ -111,15 +111,17 @@ def MOD_ADDER():
 
 
 
-N = 6 #number to be factored
+N = 215 #number to be factored
 n = int(np.ceil(np.log2(N))) #bitsize of N
 
-a = 2
+a = 100
 
-b = 3
-ADDER = ADDER(a, b)
+b = 101
 
-execute_sim=0
+
+ADDER = ADDER()
+
+execute_sim=1
 
 if execute_sim == 1:
     
@@ -140,8 +142,10 @@ if execute_sim == 1:
          enumerated_qbits.append(B[i])
      for i in range(n):
          enumerated_qbits.append(C[i])
-     
+         
+     initialize(a, b)
      c.append(ADDER, enumerated_qbits)
+     
      c.draw(fold=-1)
      
      c.measure_all()

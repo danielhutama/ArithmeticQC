@@ -117,9 +117,9 @@ n = int(np.ceil(np.log2(N))) #bitsize of N
 a = 2
 
 b = 3
-ADDER = ADDER(a, b)
+# ADDER = ADDER(a, b)
 
-execute_sim=0
+execute_sim=1
 
 if execute_sim == 1:
     
