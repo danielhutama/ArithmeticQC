@@ -67,7 +67,7 @@ def initialize(a, b):
 
 
 
-def ADDER():
+def ADDER(a, b):
     #2n+1 qubit needed
     
     # initialize registers for addition gate
@@ -76,6 +76,23 @@ def ADDER():
     C = QuantumRegister(n, 'c')
     QR_circ = QuantumCircuit(A, B, C, name='ADDER')
     
+
+    # encode a and b into LSB-first binary 
+    if type(a) == str:
+        pass
+    else:
+        a_bin = get_binary_LSB_to_MSB(a, n)
+        for i in range(len(a_bin)):
+            if a_bin[i] == '1':
+                QR_circ.x(A[i]) #only for testing (decimal argument passed)
+    if type(b) == str:
+        pass
+    else:
+        b_bin = get_binary_LSB_to_MSB(b, n+1)
+        for i in range(len(b_bin)):
+            if b_bin[i] == '1':
+                QR_circ.x(B[i])
+
 
     # cascaded CARRY gates
     for i in range(n-1):
@@ -111,13 +128,13 @@ def MOD_ADDER():
 
 
 
-N = 6 #number to be factored
+N = 21 #number to be factored
 n = int(np.ceil(np.log2(N))) #bitsize of N
 
-a = 2
+a = 7
 
-b = 3
-# ADDER = ADDER(a, b)
+b = 11
+ADDER = ADDER(a, b)
 
 execute_sim=1
 
