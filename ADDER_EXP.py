@@ -2,6 +2,10 @@
 """
 Created on Fri Mar 18 13:35:15 2022
 
+When I started writing this in March 2022, only God and myself knew how this uncommented code was structured.
+Now, when you are reading this, only God knows and I have bareley an inkling of an idea. 
+This works is based off of Vlatko Vedral's paper on quantum arithmetic circuits.
+
 @author: Daniel Hutama
 
 """
@@ -45,27 +49,7 @@ def get_binary_LSB_to_MSB(num, size):
     return np.binary_repr(num, size)[::-1]
 
 
-
-def initialize(a, b):
-        #untested function to encode binary into to |0> registers
-    # get LSB-first binary representations of input integers
-    # may already be in binary
-    if type(a) == str:
-        pass
-    else:
-        a_bin = get_binary_LSB_to_MSB(a, n)
-        for i in range(len(a_bin)):
-            if a_bin[i] == '1':
-                QR_circ.x(A[i]) #only for testing (decimal argument passed)
-    if type(b) == str:
-        pass
-    else:
-        b_bin = get_binary_LSB_to_MSB(b, n+1)
-        for i in range(len(b_bin)):
-            if b_bin[i] == '1':
-                QR_circ.x(B[i])
     
-
 
 
 def ADDER(a, b, classical=True):
@@ -113,74 +97,3 @@ def ADDER(a, b, classical=True):
     # final SUM
     QR_circ.append(SUM, [C[0], A[0], B[0]])
     return QR_circ.to_instruction()
-
-
-def rADDER():
-    # reversed ADDER
-    A = QuantumRegister(n, 'a')
-    B = QuantumRegister(n+1, 'b')
-    C = QuantumRegister(n, 'c')
-    QR_circ = QuantumCircuit(A, B, C, name='rADDER')
-    
-    pass #unfinised
-    
-
-def MOD_ADDER():
-    # 4n+2 qubits needed
-    pass
-
-
-
-
-N = 21 #number to be factored
-n = int(np.ceil(np.log2(N))) #bitsize of N
-
-a = 7
-
-b = 11
-
-ADDER = ADDER(a, b, False)
-
-execute_sim=1
-
-if execute_sim == 1:
-    
-    
-    # # initialize 10 qubit system
-     A = QuantumRegister(n, 'a')        
-     B = QuantumRegister(n+1, 'b')
-     C = QuantumRegister(n, 'c')
-    
-     QR_circ = QuantumCircuit(A, B, C)
-     c = QR_circ
-     
-     enumerated_qbits = []
-     # build list of target qbits for append function
-     for i in range(n):
-         enumerated_qbits.append(A[i])
-     for i in range(n+1):
-         enumerated_qbits.append(B[i])
-     for i in range(n):
-         enumerated_qbits.append(C[i])
-     
-     c.append(ADDER, enumerated_qbits)
-     c.draw(fold=-1)
-     
-     c.measure_all()
-    
-     
-     
-     simulator = Aer.get_backend('aer_simulator')
-     c = transpile(c, simulator)
-     result = simulator.run(c).result()
-     counts = result.get_counts(c)
-     out = list(counts.keys())[0][::-1]
-    
-     A_out = out[0:n]
-     B_out = out[n: 2*n + 1]
-     C_out = out[2*n+1::]
-     
-     
-     print('IN  | Register A: {} ({}), Register B: {} ({})'.format(get_binary_LSB_to_MSB(a, n), a, get_binary_LSB_to_MSB(b, n+1), b))
-     print('OUT | Register A: {} ({}), Register B: {} ({}), Register C: {}'.format(A_out, int(A_out[::-1], 2), B_out, int(B_out[::-1], 2), C_out))
-
