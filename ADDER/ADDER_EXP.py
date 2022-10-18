@@ -88,6 +88,7 @@ ADDER = ADDER(n)
 
 # generate dictionaries - keys are the state buckets, values are the probabilities
 a_dict = {}
+a_dict_adj = {}
 b_dict = {}
 c_dict = {}
 
@@ -97,6 +98,7 @@ for i in range(2**n):
 
 for i in range(2**(n+1)):
     b_dict[i] = 0
+    a_dict_adj[i] = 0
 
 # this should allow me to set initialization values by adjusting the keyed value based on the decimal representation of the bin.
 a_dict[0] = 0
@@ -107,6 +109,16 @@ a_dict[4] = np.sqrt(1/4)
 a_dict[5] = 0
 a_dict[6] = 0
 a_dict[7] = 0
+
+#for input state plot
+a_dict_adj[0] = 0
+a_dict_adj[1] = 0
+a_dict_adj[2] = np.sqrt(1/4)
+a_dict_adj[3] = np.sqrt(1/2)
+a_dict_adj[4] = np.sqrt(1/4)
+a_dict_adj[5] = 0
+a_dict_adj[6] = 0
+a_dict_adj[7] = 0
 
 b_dict[0] = 0
 b_dict[1] = 0
@@ -171,7 +183,12 @@ if execute == 1:
         counts_binary[badkey[n:2*n+1]] += counts[badkey]
 
 counts_binary
-plot_histogram(counts_binary)
 
+
+plot_histogram(a_dict_adj)
+
+plot_histogram(b_dict)
+
+plot_histogram(counts_binary)
 
 
