@@ -1,16 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Mar 18 13:35:15 2022
+Created on Tue Oct 18 01:16:24 2022
 
-
-This work is based off of Vlatko Vedral's paper on quantum arithmetic circuits. There is also a nice paper on my Github. 
-The idea is to package the quantum ADDER into a module that dynamically adjust based on the input size.
-This dynamic adjustability is necessary to stack multiple ADDERs together for the creation of a MOD ADDER.
-
-
-@author: Daniel Hutama
-email: dhuta087@uottawa.ca
+@author: danhu
 """
+
 import numpy as np
 
 from qiskit import *
@@ -80,11 +74,16 @@ def ADDER(n):
     QR_circ.append(SUM, [C[0], A[0], B[0]])
     return QR_circ.to_instruction()
 
- 
+
+
+
+
 
 
 n = 3
-ADDER = ADDER(n)
+trials = 10000
+
+
 
 # generate dictionaries - keys are the state buckets, values are the probabilities
 a_dict = {}
@@ -124,54 +123,46 @@ b_init = list(b_dict.values())
 c_init = list(c_dict.values())
 
 
-execute = 1
-trials = 10000
-if execute == 1:
-    
-    # # initialize 10 qubit system
-     A = QuantumRegister(n, 'a')        
-     B = QuantumRegister(n+1, 'b')
-     C = QuantumRegister(n, 'c')
-    
-     QR_circ = QuantumCircuit(A, B, C)
-     c = QR_circ
-     c.initialize(a_init, A)
-     c.initialize(b_init, B)
-     # c.initialize(c_init, C)
-     
-     enumerated_qbits = []
-     # build list of target qbits for append function
-     for i in range(n):
-         enumerated_qbits.append(A[i])
-     for i in range(n+1):
-         enumerated_qbits.append(B[i])
-     for i in range(n):
-         enumerated_qbits.append(C[i])
-     
-     c.append(ADDER, enumerated_qbits)
-     c.draw(fold=-1)
-     
-     c.measure_all()
-    
-     
-     
-     simulator = Aer.get_backend('aer_simulator')
-     # simulator = QasmSimulator()
-     c = transpile(c, simulator)
-     result = simulator.run(c, shots = trials).result()
-     counts = result.get_counts(c)
-     # out = list(counts.keys())[0][::-1]
-     
-     counts_binary = {}
-     for i in list(b_dict.keys()):
-         counts_binary[np.binary_repr(i, n+1)] = 0
-         
-         
-     for badkey in list(counts.keys()):
-        counts_binary[badkey[n:2*n+1]] += counts[badkey]
 
-counts_binary
-plot_histogram(counts_binary)
+
+
+A = QuantumRegister(n, 'a')        
+B = QuantumRegister(n+1, 'b')
+C = QuantumRegister(n, 'c')
+   
+QR_circ = QuantumCircuit(A, B, C)
+c = QR_circ
+c.initialize(a_init, A)
+c.initialize(b_init, B)
+
+for i in range(n-1):
+    c.append(CARRY, [C[i], A[i], B[i], C[i+1]])
+c.append(CARRY, [C[n-1], A[n-1], B[n-1], B[n]])
+c.cx(A[n-1], B[n-1])
+for i in range(n-1):
+    c.append(SUM, [C[n-1-i], A[n-1-i], B[n-1-i]])
+    c.append(rCARRY, [C[n-2-i], A[n-2-i], B[n-2-i], C[n-1-i]])
+c.append(SUM, [C[0], A[0], B[0]])
+
+c.measure_all()
+
+
+
+     
+simulator = Aer.get_backend('aer_simulator')
+# simulator = QasmSimulator()
+c = transpile(c, simulator)
+result = simulator.run(c, shots = trials).result()
+counts = result.get_counts(c)
+
+
+
+
+
+
+
+
+
 
 
 

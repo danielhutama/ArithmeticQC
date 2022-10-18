@@ -132,12 +132,12 @@ def MOD_ADDER():
 
 
 
-N = 21 #number to be factored
+N = 6 #number to be factored
 n = int(np.ceil(np.log2(N))) #bitsize of N
 
-a = 7
+a = 2
 
-b = 11
+b = 3
 
 ADDER = ADDER(a, b, False)
 
